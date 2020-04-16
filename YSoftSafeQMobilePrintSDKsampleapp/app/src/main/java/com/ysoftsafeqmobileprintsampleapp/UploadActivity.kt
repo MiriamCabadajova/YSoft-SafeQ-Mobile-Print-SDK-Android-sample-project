@@ -21,7 +21,7 @@ class UploadActivity : AppCompatActivity() {
 
     lateinit var serverUri: String
     lateinit var deliveryEndpoint: String
-    lateinit var token: String
+    var token = ""
     var filePaths = arrayListOf<String>()
     private var printJobsArray = arrayListOf<PrintJob>()
 
