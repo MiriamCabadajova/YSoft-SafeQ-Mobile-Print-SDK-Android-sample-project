@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">YSoft SafeQ Mobile Print SDK - sample app</string>
+    <string name="saved_server_uri_key">saved_server_uri_key</string>
+    <string name="saved_user_login_key">saved_user_login_key</string>
+    <string name="saved_user_password_key">saved_user_password_key</string>
+
+    <string name="login">Login</string>
+    <string name="logging_in">Logging in ...</string>
+
+    <string name="title_save_credentials_fail">Failed to save credentials</string>
+</resources>

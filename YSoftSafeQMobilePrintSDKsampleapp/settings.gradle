@@ -1,0 +1,2 @@
+include ':app'
+rootProject.name='YSoft SafeQ Mobile Print SDK - sample app'
