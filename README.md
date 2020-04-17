@@ -1,5 +1,5 @@
 # YSoft SafeQ Mobile Print SDK Android
-## Sample mobile application
+
 This repository intends to deliver the mobile SDK for Android within a sample mobile application, developed for the YSoft Corporation a.s., for accessing the functionality of SafeQ product.
 
 The main functionality included in the SDK is the login and upload to the YSoft SafeQ using two main channels - End User Interface and the Mobile Integration Gateway.
