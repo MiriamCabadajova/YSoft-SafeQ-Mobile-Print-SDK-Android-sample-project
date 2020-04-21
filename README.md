@@ -9,7 +9,7 @@ The mobile SDK is supplied in the *sdk* folder. It includes *Login.kt* and *Uplo
 For more detailed instructions on how to integrate the mobile SDK into your iOS application and utilize its functionality, see the bachelor's thesis... 
 
 
-## User Experience - sample application
+## User Experience
 The minimal required version of Android is Marshmallow - 6.0 (API 23).
 
 You can launch the application by opening the topmost folder through the Android Studio IDE. 
