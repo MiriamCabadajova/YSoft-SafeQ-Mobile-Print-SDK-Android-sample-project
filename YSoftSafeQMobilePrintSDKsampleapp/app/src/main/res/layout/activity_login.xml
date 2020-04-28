@@ -11,7 +11,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="115dp"
+        android:layout_marginTop="176dp"
         android:text="Server Name"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -21,14 +21,14 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="100dp"
+        android:layout_marginTop="16dp"
         android:layout_marginEnd="8dp"
         android:ems="10"
+        android:hint="server url"
         android:inputType="textPersonName"
-        android:text="https://sq-brno.ysoft.local:8050/"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/server_label"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/discovery_button" />
 
     <EditText
         android:id="@+id/username_edittext"
@@ -38,8 +38,8 @@
         android:layout_marginTop="20dp"
         android:layout_marginEnd="8dp"
         android:ems="10"
+        android:hint="username"
         android:inputType="textPersonName"
-        android:text="cabadajova"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/username_label"
         app:layout_constraintTop_toBottomOf="@+id/server_edittext" />
@@ -62,6 +62,7 @@
         android:layout_marginTop="20dp"
         android:layout_marginEnd="8dp"
         android:ems="10"
+        android:hint="password "
         android:inputType="textPassword"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/password_label"
@@ -87,5 +88,15 @@
         android:text="Username"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/server_label" />
+
+    <Button
+        android:id="@+id/discovery_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="100dp"
+        android:text="Discover"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

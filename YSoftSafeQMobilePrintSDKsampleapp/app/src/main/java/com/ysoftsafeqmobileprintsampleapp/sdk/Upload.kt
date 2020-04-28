@@ -51,7 +51,6 @@ class Upload(
         val request = Request.Builder()
             .url(url)
             .build()
-
         val call = Login.client.newCall(request)
         call.enqueue(callback)
         return call

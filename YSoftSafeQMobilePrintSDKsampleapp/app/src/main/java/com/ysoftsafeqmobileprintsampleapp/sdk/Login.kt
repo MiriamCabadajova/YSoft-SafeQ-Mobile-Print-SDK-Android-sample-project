@@ -40,7 +40,6 @@ class Login(
 
     companion object {
         var client: OkHttpClient = OkHttpClient()
-        //var discovery_client: OkHttpClient = OkHttpClient()
     }
 
     fun get(url: String, callback: Callback, myclient: OkHttpClient): Call {
@@ -116,7 +115,6 @@ class Login(
 
         determineDeliveryEndpoint()
         val url = getLoginUrl()
-        Log.i("loginUrl", url)
         try {
             get(
                 url,

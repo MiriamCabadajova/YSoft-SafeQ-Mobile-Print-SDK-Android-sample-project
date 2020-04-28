@@ -5,8 +5,10 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import com.ysoftsafeqmobileprintsampleapp.sdk.Discovery
 import com.ysoftsafeqmobileprintsampleapp.sdk.Login
 import kotlinx.android.synthetic.main.activity_login.*
+import okhttp3.HttpUrl
 
 class LoginActivity : AppCompatActivity() {
 
@@ -15,6 +17,7 @@ class LoginActivity : AppCompatActivity() {
 
     var deliveryEndpoint = DELIVERY_ENDPOINT_MIG
     var sharedArrayList: ArrayList<String> = arrayListOf()
+    lateinit var discoveryClass: Discovery
 
     var sharedUri = ""
 
@@ -30,6 +33,12 @@ class LoginActivity : AppCompatActivity() {
         return password_edittext.text.toString()
     }
 
+    private fun setUrl(value: String) {
+        runOnUiThread {
+            server_edittext.setText(value)
+        }
+    }
+
     private fun getUrl(suffix: String): String {
         val uri = getUri()
 
@@ -41,6 +50,50 @@ class LoginActivity : AppCompatActivity() {
         }
 
         return uri + suffix
+    }
+    private val discoveryCallback = object : Discovery.DiscoveryCallback {
+        override fun showDialog(title: String, message: String) {
+            this@LoginActivity.runOnUiThread {
+                val alertDialogBuilder = AlertDialog.Builder(this@LoginActivity)
+                alertDialogBuilder.setTitle(title)
+                alertDialogBuilder.setMessage(message)
+                alertDialogBuilder.setPositiveButton(android.R.string.ok) { dialog, _ ->
+                    dialog.dismiss()
+                }
+                val alert = alertDialogBuilder.create()
+                alert.show()
+            }
+        }
+
+        override fun promptUserForUrlConfirmation(url: HttpUrl) {
+            this@LoginActivity.runOnUiThread {
+                val alertDialogBuilder = AlertDialog.Builder(this@LoginActivity)
+                alertDialogBuilder.setTitle("Discovery")
+                alertDialogBuilder.setMessage(url.toString())
+                alertDialogBuilder.setPositiveButton(android.R.string.ok) { dialog, _ ->
+                    setUrl(url.toString())
+                    dialog.dismiss()
+                }
+                alertDialogBuilder.setNegativeButton(android.R.string.no) { dialog, _ ->
+                    discoveryClass.verifyDomain()
+                }
+                val alert = alertDialogBuilder.create()
+                alert.show()
+            }
+        }
+
+        override fun hideDiscoveringBtn(flag: Boolean) {
+            this@LoginActivity.runOnUiThread {
+                runOnUiThread {
+                    if (flag) {
+                        discovery_button.text = "Discover"
+                    } else {
+                        discovery_button.text = "Discovering"
+                    }
+                    setAllButtons(flag)
+                }
+            }
+        }
     }
 
     private val loginCallback = object : Login.LoginCallback {
@@ -107,18 +160,15 @@ class LoginActivity : AppCompatActivity() {
 
     }
 
-
-
     private fun setAllButtons(flag: Boolean) {
         runOnUiThread {
             server_edittext.isEnabled = flag
             username_edittext.isEnabled = flag
             password_edittext.isEnabled = flag
             login_button.isEnabled = flag
+            discovery_button.isEnabled = flag
         }
-
     }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -140,6 +190,12 @@ class LoginActivity : AppCompatActivity() {
             } else {
                 loginCallback.showDialog("Login Failed", "Empty fields detected")
             }
+        }
+
+        discoveryClass = Discovery(discoveryCallback, this)
+        discovery_button.setOnClickListener {
+            discoveryClass.serverName = server_edittext.text.toString()
+            discoveryClass.discoverServer()
         }
     }
 
