@@ -18,9 +18,9 @@ class Upload(
 
 ) {
     interface UploadCallback {
+        fun showDialog(title: String, message: String)
         fun isUploadBeingProcessed(flag: Boolean)
         fun selectBtnIsVisible(flag: Boolean)
-        fun showDialog(title: String, message: String)
     }
 
     val DELIVERY_ENDPOINT_EUI = "eui"

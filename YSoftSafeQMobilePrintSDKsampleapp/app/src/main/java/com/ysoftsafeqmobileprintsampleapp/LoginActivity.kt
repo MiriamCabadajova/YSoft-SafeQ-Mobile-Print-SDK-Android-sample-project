@@ -175,9 +175,9 @@ class LoginActivity : AppCompatActivity(), Login.LoginCallback, Discovery.Discov
             }
         }
 
-        discoveryClass = Discovery(this)
+        discoveryClass = Discovery(this, server_edittext.text.toString())
         discovery_button.setOnClickListener {
-            discoveryClass.serverName = server_edittext.text.toString()
+//            discoveryClass.serverName = server_edittext.text.toString()
             discoveryClass.discoverServer()
         }
     }

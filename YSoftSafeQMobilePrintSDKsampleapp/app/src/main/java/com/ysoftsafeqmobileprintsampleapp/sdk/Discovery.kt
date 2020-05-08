@@ -20,7 +20,8 @@ import javax.net.ssl.HostnameVerifier
 import kotlin.collections.ArrayList
 
 class Discovery(
-    private val discoveryCallback: DiscoveryCallback
+    private val discoveryCallback: DiscoveryCallback,
+    private val serverName: String
 ) {
 
     private inner class IppDiscoveryListener : ServiceListener {
@@ -83,7 +84,7 @@ class Discovery(
     }
 
     var wifiManager: WifiManager? = null
-    var serverName: String = ""
+//    var serverName: String = ""
     private val trust = CustomTrust()
     private val domainsForVerification: ArrayList<String> = ArrayList()
     private val ippDomainsForVerification: ArrayList<String> = ArrayList()

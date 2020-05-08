@@ -30,11 +30,11 @@ class Login(
     var deliveryEndpoint = DELIVERY_ENDPOINT_EUI
 
     interface LoginCallback {
+        fun showDialog(title: String, message: String)
         fun showLoginProgressBar(flag: Boolean)
         fun invokeUploadActivity(token: String)
         fun savePreferences()
         fun clearPreferences()
-        fun showDialog(title: String, message: String)
     }
 
     companion object {
