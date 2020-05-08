@@ -26,7 +26,6 @@ class Login(
 ) {
     val DELIVERY_ENDPOINT_EUI = "eui"
     val DELIVERY_ENDPOINT_MIG = "mig"
-    val DELIVERY_ENDPOINT_CUPS = "cups"
 
     var deliveryEndpoint = DELIVERY_ENDPOINT_EUI
 
@@ -137,8 +136,6 @@ class Login(
 
                             if (deliveryEndpoint == DELIVERY_ENDPOINT_MIG) {
                                 postLoginMig()
-                            } else if (deliveryEndpoint == DELIVERY_ENDPOINT_CUPS) {
-                                loginCallback.invokeUploadActivity("")
                             } else {
                                 val loginToken = responseString?.substring(
                                     csrfMatcher.start() + 14,
@@ -179,9 +176,7 @@ class Login(
     private fun determineDeliveryEndpoint() {
         if (serverUrl.contains("end-user")) {
             this.deliveryEndpoint = DELIVERY_ENDPOINT_EUI
-        } else if (serverUrl.contains("printers") || serverUrl.contains(":631")) {
-            this.deliveryEndpoint = DELIVERY_ENDPOINT_CUPS
-        } else {
+        }  else {
             this.deliveryEndpoint = DELIVERY_ENDPOINT_MIG
         }
     }
@@ -189,8 +184,6 @@ class Login(
     private fun getLoginPattern(): Pattern {
         if (deliveryEndpoint == DELIVERY_ENDPOINT_MIG) {
             return Pattern.compile("configuration")
-        } else if (deliveryEndpoint == DELIVERY_ENDPOINT_CUPS) {
-            return Pattern.compile(".*")
         }
         return Pattern.compile("_csrf\".*")
     }

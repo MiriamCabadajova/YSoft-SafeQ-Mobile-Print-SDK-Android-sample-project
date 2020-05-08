@@ -1,6 +1,5 @@
 package com.ysoftsafeqmobileprintsampleapp.sdk
 
-import android.content.Context
 import android.net.wifi.WifiManager
 import android.util.Log
 import android.webkit.URLUtil
@@ -21,8 +20,7 @@ import javax.net.ssl.HostnameVerifier
 import kotlin.collections.ArrayList
 
 class Discovery(
-    private val discoveryCallback: DiscoveryCallback,
-    private val context: Context
+    private val discoveryCallback: DiscoveryCallback
 ) {
 
     private inner class IppDiscoveryListener : ServiceListener {
@@ -154,6 +152,7 @@ class Discovery(
     }
 
     fun discoverServer() {
+        discoveryCallback.hideDiscoveringBtn(false)
         discovery_client = trust.clientBuilder
             .hostnameVerifier(HostnameVerifier { _, _ -> true })
             .followRedirects(true)

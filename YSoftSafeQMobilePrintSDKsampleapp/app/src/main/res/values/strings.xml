@@ -5,7 +5,11 @@
     <string name="saved_user_password_key">saved_user_password_key</string>
 
     <string name="login">Login</string>
-    <string name="logging_in">Logging in ...</string>
+    <string name="logging_in">Logging in …</string>
+
+    <string name="discovery">Discovery</string>
+    <string name="discovering">Discovering …</string>
+
 
     <string name="title_save_credentials_fail">Failed to save credentials</string>
 </resources>
