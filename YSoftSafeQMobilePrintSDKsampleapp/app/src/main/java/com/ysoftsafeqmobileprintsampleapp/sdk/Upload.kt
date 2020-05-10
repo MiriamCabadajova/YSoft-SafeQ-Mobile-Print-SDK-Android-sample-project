@@ -125,7 +125,6 @@ class Upload(
 
         val uploadUrl: String = this.getUrl("upload-job")
 
-        val MEDIA_TYPE_JPEG: MediaType? = "*/*".toMediaTypeOrNull()
         val requestBody: RequestBody = MultipartBody.Builder()
             .setType(MultipartBody.FORM)
             .addFormDataPart("importFile", myFile.name, myFile.readBytes().toRequestBody())
@@ -327,7 +326,7 @@ class Upload(
                 val dialogMessageSuccessful = "Successfully uploaded "
                 if (isLastElement) {
 
-                    var finalMessage = ""
+                    finalMessage = ""
                     dialogTitle = "Upload Completed"
                     finalMessage += dialogMessageSuccessful
 

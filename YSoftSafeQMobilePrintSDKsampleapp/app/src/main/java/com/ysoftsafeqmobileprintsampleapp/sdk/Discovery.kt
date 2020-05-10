@@ -1,5 +1,6 @@
 package com.ysoftsafeqmobileprintsampleapp.sdk
 
+import android.net.ConnectivityManager
 import android.net.wifi.WifiManager
 import android.util.Log
 import android.webkit.URLUtil
@@ -19,10 +20,26 @@ import javax.jmdns.ServiceListener
 import javax.net.ssl.HostnameVerifier
 import kotlin.collections.ArrayList
 
+//10.0.7.20 sq-brno.ysoft.local
 class Discovery(
     private val discoveryCallback: DiscoveryCallback,
     private val serverName: String
 ) {
+
+    private val trust = CustomTrust()
+    private val domainsForVerification: ArrayList<String> = ArrayList()
+    private val ippDomainsForVerification: ArrayList<String> = ArrayList()
+    private var currentUrl: String? = null
+    var jmdns: JmDNS? = null
+    var discoveryThread: Thread? = null
+    var wifiManager: WifiManager? = null
+    var connectivityManager: ConnectivityManager? = null
+
+    interface DiscoveryCallback {
+        fun showDialog(title: String, message: String)
+        fun promptUserForUrlConfirmation(url: HttpUrl)
+        fun hideDiscoveringBtn(flag: Boolean)
+    }
 
     private inner class IppDiscoveryListener : ServiceListener {
 
@@ -67,30 +84,16 @@ class Discovery(
             }
             println(builder)
 
-            val domaininUrl:String = "http://" + ev.info.address.toString() + ":631/" +  ev.info.getPropertyString("rp")
+            val domaininUrl: String =
+                "http://" + ev.info.address.toString() + ":631/" + ev.info.getPropertyString("rp")
             println(domaininUrl)
 
             if (domaininUrl.toHttpUrlOrNull() != null) {
                 ippDomainsForVerification?.add(domaininUrl)
             }
         }
-
     }
 
-    interface DiscoveryCallback {
-        fun showDialog(title: String, message: String)
-        fun promptUserForUrlConfirmation(url: HttpUrl)
-        fun hideDiscoveringBtn(flag: Boolean)
-    }
-
-    var wifiManager: WifiManager? = null
-//    var serverName: String = ""
-    private val trust = CustomTrust()
-    private val domainsForVerification: ArrayList<String> = ArrayList()
-    private val ippDomainsForVerification: ArrayList<String> = ArrayList()
-    private var currentUrl: String? = null
-    var jmdns: JmDNS? = null
-    var discoveryThread: Thread? = null
 
     private fun getUrl(suffix: String): String {
         val items = serverName.split("://")
@@ -128,7 +131,7 @@ class Discovery(
         return address
     }
 
-    private var mIppDiscoveryListener : IppDiscoveryListener? = null
+    private var mIppDiscoveryListener: IppDiscoveryListener? = null
     fun startIppDiscovery() {
 
         if (jmdns != null) {
@@ -168,7 +171,7 @@ class Discovery(
             val enteredUrl = serverName
             if (!URLUtil.isValidUrl(getUrl(enteredUrl))) {
 
-                if (!enteredUrl.contains("safeq6")) {
+                if (enteredUrl.contains("safeq6")) {
                     domainsForVerification.add("https://safeq6.$enteredUrl:8050")
                     domainsForVerification.add("https://safeq6.$enteredUrl")
                     domainsForVerification.add("https://safeq6.$enteredUrl/end-user/ui/")
@@ -203,7 +206,8 @@ class Discovery(
         domainsForVerification.addAll(ippDomainsForVerification)
 
         if (domainsForVerification.size == 0) {
-            discoveryCallback.showDialog("No server discovered",
+            discoveryCallback.showDialog(
+                "No server discovered",
                 "Please try to enter your domain (e.g. ysoft.local) into Server textfield and press Discover button again."
             )
             discoveryCallback.hideDiscoveringBtn(true)
@@ -288,7 +292,10 @@ class Discovery(
                                 if (loginToken.isNotEmpty()) {
                                     discoveryCallback.promptUserForUrlConfirmation(response.request.url)
                                 } else {
-                                    discoveryCallback.showDialog("Discovery failed", "Server does not provide EU/MPS interface.")
+                                    discoveryCallback.showDialog(
+                                        "Discovery failed",
+                                        "Server does not provide EU/MPS interface."
+                                    )
                                     //discoveryCallback.showLoginProgressBar(false)
                                 }
                             } else {

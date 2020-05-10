@@ -1,7 +1,10 @@
 package com.ysoftsafeqmobileprintsampleapp
 
+import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.wifi.WifiManager
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -61,7 +64,7 @@ class LoginActivity : AppCompatActivity(), Login.LoginCallback, Discovery.Discov
                 hideDiscoveringBtn(true)
                 dialog.dismiss()
             }
-            alertDialogBuilder.setNegativeButton(android.R.string.no) { dialog, _ ->
+            alertDialogBuilder.setNegativeButton(android.R.string.no) { _, _ ->
                 discoveryClass.verifyDomain()
             }
             val alert = alertDialogBuilder.create()
@@ -176,8 +179,18 @@ class LoginActivity : AppCompatActivity(), Login.LoginCallback, Discovery.Discov
         }
 
         discoveryClass = Discovery(this, server_edittext.text.toString())
+
+        // mDNS based discovery which must run in background
+        val connectivityManager: ConnectivityManager =
+            applicationContext.getSystemService(Service.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val wifiManager: WifiManager =
+            applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        discoveryClass.connectivityManager = connectivityManager
+        discoveryClass.wifiManager = wifiManager
+
+        // Start mDNS background discovery
+        discoveryClass.startIppDiscovery()
         discovery_button.setOnClickListener {
-//            discoveryClass.serverName = server_edittext.text.toString()
             discoveryClass.discoverServer()
         }
     }

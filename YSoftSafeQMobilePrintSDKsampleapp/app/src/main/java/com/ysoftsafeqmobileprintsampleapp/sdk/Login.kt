@@ -130,18 +130,19 @@ class Login(
                         Log.d("getLogin", "success")
                         val responseString: String? = response.body?.string()
                         val csrfPattern: Pattern = getLoginPattern()
-                        val csrfMatcher: Matcher = csrfPattern.matcher(responseString)
+                        val csrfMatcher: Matcher =
+                            csrfPattern.matcher(responseString as CharSequence)
 
                         if (csrfMatcher.find()) {
 
                             if (deliveryEndpoint == DELIVERY_ENDPOINT_MIG) {
                                 postLoginMig()
                             } else {
-                                val loginToken = responseString?.substring(
+                                val loginToken = responseString.substring(
                                     csrfMatcher.start() + 14,
                                     csrfMatcher.end() - 2
                                 )
-                                if (loginToken != null) {
+                                if (/*loginToken != null && */loginToken.isNotEmpty()) {
                                     postLoginEui(loginToken)
                                 } else {
                                     loginCallback.showDialog(
@@ -176,7 +177,7 @@ class Login(
     private fun determineDeliveryEndpoint() {
         if (serverUrl.contains("end-user")) {
             this.deliveryEndpoint = DELIVERY_ENDPOINT_EUI
-        }  else {
+        } else {
             this.deliveryEndpoint = DELIVERY_ENDPOINT_MIG
         }
     }
@@ -242,8 +243,8 @@ class Login(
                     loginCallback.clearPreferences()
                 }
 
-                val token = Credentials.basic(username, password)
-                loginCallback.invokeUploadActivity(token)
+                val loginToken = Credentials.basic(username, password)
+                loginCallback.invokeUploadActivity(loginToken)
 
 
             }
@@ -283,7 +284,8 @@ class Login(
                     try {
                         val responseString = response.body?.string()
                         val csrfPattern: Pattern = Pattern.compile("Login to YSoft SafeQ")
-                        val csrfMatcher: Matcher = csrfPattern.matcher(responseString)
+                        val csrfMatcher: Matcher =
+                            csrfPattern.matcher(responseString as CharSequence)
                         if (csrfMatcher.find()) {
                             loginCallback.showLoginProgressBar(false)
                             loginCallback.showDialog(
