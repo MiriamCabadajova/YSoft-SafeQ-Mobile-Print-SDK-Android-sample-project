@@ -8,30 +8,32 @@ import android.net.wifi.WifiManager
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import com.ysoftsafeqmobileprintsampleapp.sdk.DELIVERY_ENDPOINT_MIG
 import com.ysoftsafeqmobileprintsampleapp.sdk.Discovery
 import com.ysoftsafeqmobileprintsampleapp.sdk.Login
 import kotlinx.android.synthetic.main.activity_login.*
 import okhttp3.HttpUrl
 
+/**
+ * Created by cabadajova on 16.4.2020.
+ */
+
 class LoginActivity : AppCompatActivity(), Login.LoginCallback, Discovery.DiscoveryCallback {
-    val DELIVERY_ENDPOINT_EUI = "eui"
-    val DELIVERY_ENDPOINT_MIG = "mig"
 
-    var deliveryEndpoint = DELIVERY_ENDPOINT_MIG
-    var sharedArrayList: ArrayList<String> = arrayListOf()
-    lateinit var discoveryClass: Discovery
+    private var deliveryEndpoint = DELIVERY_ENDPOINT_MIG
+    private var sharedArrayList: ArrayList<String> = arrayListOf()
+    private lateinit var discoveryClass: Discovery
+    private var sharedUri = ""
 
-    var sharedUri = ""
-
-    fun getUri(): String {
+    private fun getUri(): String {
         return server_edittext.text.toString()
     }
 
-    fun getLogin(): String {
+    private fun getLogin(): String {
         return username_edittext.text.toString()
     }
 
-    fun getPassword(): String {
+    private fun getPassword(): String {
         return password_edittext.text.toString()
     }
 
@@ -41,17 +43,17 @@ class LoginActivity : AppCompatActivity(), Login.LoginCallback, Discovery.Discov
         }
     }
 
-    private fun getUrl(suffix: String): String {
+    private fun getUrl(): String {
         val uri = getUri()
 
         if (this.deliveryEndpoint == DELIVERY_ENDPOINT_MIG) {
             val items = uri.split("://")
             if (items.size > 1) {
-                return "https://" + items[1] + suffix
+                return "https://" + items[1]
             }
         }
 
-        return uri + suffix
+        return uri
     }
 
     override fun promptUserForUrlConfirmation(url: HttpUrl) {
@@ -165,7 +167,7 @@ class LoginActivity : AppCompatActivity(), Login.LoginCallback, Discovery.Discov
                 val loginClass = Login(
                     this,
                     this,
-                    getUrl(""),
+                    getUrl(),
                     getLogin(),
                     getPassword(),
                     true
@@ -190,7 +192,9 @@ class LoginActivity : AppCompatActivity(), Login.LoginCallback, Discovery.Discov
 
         // Start mDNS background discovery
         discoveryClass.startIppDiscovery()
+
         discovery_button.setOnClickListener {
+            discoveryClass.serverName = server_edittext.text.toString()
             discoveryClass.discoverServer()
         }
     }

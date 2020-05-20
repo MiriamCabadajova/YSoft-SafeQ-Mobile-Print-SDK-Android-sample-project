@@ -9,6 +9,10 @@ import android.widget.Button
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.recyclerview_item.view.*
 
+/**
+ * Created by cabadajova on 16.4.2020.
+ */
+
 class PrintJobAdapter(
     private val printJobs: ArrayList<PrintJob>,
     private val context: Context
@@ -21,7 +25,9 @@ class PrintJobAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder(LayoutInflater.from(context).inflate(R.layout.recyclerview_item, parent, false))
+        return ViewHolder(
+            LayoutInflater.from(context).inflate(R.layout.recyclerview_item, parent, false)
+        )
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {

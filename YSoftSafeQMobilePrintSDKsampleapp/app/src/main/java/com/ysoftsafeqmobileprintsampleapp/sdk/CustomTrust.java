@@ -27,12 +27,14 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.util.Arrays;
 import java.util.Collection;
+
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
+
 import okhttp3.CertificatePinner;
 import okhttp3.OkHttpClient;
 import okio.Buffer;
@@ -45,7 +47,7 @@ public final class CustomTrust {
         return this.clientBuilder;
     }
 
-    public CustomTrust()  {
+    public CustomTrust() {
         X509TrustManager trustManager;
         X509TrustManager defaultTrustManager;
         X509TrustManager trustAllCerts =
@@ -69,7 +71,7 @@ public final class CustomTrust {
             defaultTrustManager = createTrustManager(null);
             trustManager = trustManagerForCertificates(trustedCertificatesInputStream());
             SSLContext sslContext = SSLContext.getInstance("TLS");
-            sslContext.init(null, new TrustManager[] { trustAllCerts }, null);
+            sslContext.init(null, new TrustManager[]{trustAllCerts}, null);
             sslSocketFactory = sslContext.getSocketFactory();
         } catch (GeneralSecurityException e) {
             throw new RuntimeException(e);

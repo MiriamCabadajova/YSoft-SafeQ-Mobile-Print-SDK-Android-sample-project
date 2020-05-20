@@ -20,18 +20,25 @@ import javax.jmdns.ServiceListener
 import javax.net.ssl.HostnameVerifier
 import kotlin.collections.ArrayList
 
-//10.0.7.20 sq-brno.ysoft.local
+/**
+ * Created by cabadajova on 16.4.2020.
+ */
+
+const val DELIVERY_ENDPOINT_EUI = "eui"
+const val DELIVERY_ENDPOINT_CUPS = "cups"
+const val DELIVERY_ENDPOINT_MIG = "mig"
+
 class Discovery(
     private val discoveryCallback: DiscoveryCallback,
-    private val serverName: String
+    var serverName: String
 ) {
 
     private val trust = CustomTrust()
     private val domainsForVerification: ArrayList<String> = ArrayList()
     private val ippDomainsForVerification: ArrayList<String> = ArrayList()
     private var currentUrl: String? = null
-    var jmdns: JmDNS? = null
-    var discoveryThread: Thread? = null
+    private var jmdns: JmDNS? = null
+    private var discoveryThread: Thread? = null
     var wifiManager: WifiManager? = null
     var connectivityManager: ConnectivityManager? = null
 
@@ -84,14 +91,15 @@ class Discovery(
             }
             println(builder)
 
-            val domaininUrl: String =
+            val domainInUrl: String =
                 "http://" + ev.info.address.toString() + ":631/" + ev.info.getPropertyString("rp")
-            println(domaininUrl)
+            println(domainInUrl)
 
-            if (domaininUrl.toHttpUrlOrNull() != null) {
-                ippDomainsForVerification?.add(domaininUrl)
+            if (domainInUrl.toHttpUrlOrNull() != null) {
+                ippDomainsForVerification.add(domainInUrl)
             }
         }
+
     }
 
 
@@ -132,8 +140,8 @@ class Discovery(
     }
 
     private var mIppDiscoveryListener: IppDiscoveryListener? = null
-    fun startIppDiscovery() {
 
+    fun startIppDiscovery() {
         if (jmdns != null) {
             return
         }
@@ -147,9 +155,9 @@ class Discovery(
                 this.jmdns?.addServiceListener("_ipp._tcp.local.", mIppDiscoveryListener)
 
             } catch (e: UnknownHostException) {
-                System.out.println(e.message)
+                Log.i("Error: ", e.message.toString())
             } catch (e: IOException) {
-                System.out.println(e.message)
+                Log.i("Error: ", e.message.toString())
             }
         }
         this.discoveryThread?.start()
@@ -165,38 +173,25 @@ class Discovery(
             .build()
 
         domainsForVerification.clear()
-
         if (serverName.isNotEmpty()) {
 
             val enteredUrl = serverName
+
             if (!URLUtil.isValidUrl(getUrl(enteredUrl))) {
 
-                if (enteredUrl.contains("safeq6")) {
-                    domainsForVerification.add("https://safeq6.$enteredUrl:8050")
-                    domainsForVerification.add("https://safeq6.$enteredUrl")
-                    domainsForVerification.add("https://safeq6.$enteredUrl/end-user/ui/")
-                    domainsForVerification.add("https://safeq6.$enteredUrl:9443/end-user/ui/")
+                if (!enteredUrl.contains("safeq6")) {
+                    addDomainsForVerification("safeq6", enteredUrl)
                 }
-
-                domainsForVerification.add("https://$enteredUrl:8050")
-                domainsForVerification.add("https://$enteredUrl")
-                domainsForVerification.add("https://$enteredUrl/end-user/ui/")
-                domainsForVerification.add("https://$enteredUrl:9443/end-user/ui/")
+                addDomainsForVerification("", enteredUrl)
 
             } else {
                 val currentDomain = URL(serverName).host
 
                 if (!currentDomain.contains("safeq6")) {
-                    domainsForVerification.add("https://safeq6.$currentDomain:8050")
-                    domainsForVerification.add("https://safeq6.$currentDomain")
-                    domainsForVerification.add("https://safeq6.$currentDomain/end-user/ui/")
-                    domainsForVerification.add("https://safeq6.$currentDomain:9443/end-user/ui/")
+                    addDomainsForVerification("safeq6", currentDomain)
                 }
 
-                domainsForVerification.add("https://$currentDomain:8050")
-                domainsForVerification.add("https://$currentDomain")
-                domainsForVerification.add("https://$currentDomain/end-user/ui/")
-                domainsForVerification.add("https://$currentDomain:9443/end-user/ui/")
+                addDomainsForVerification("", currentDomain)
 
             }
 
@@ -215,6 +210,18 @@ class Discovery(
         }
 
         verifyDomain()
+
+    }
+
+    private fun addDomainsForVerification(prefix: String, enteredUrl: String) {
+        var newPrefix = ""
+        if (prefix != "") {
+            newPrefix = "$prefix."
+        }
+        domainsForVerification.add("https://$newPrefix$enteredUrl:8050")
+        domainsForVerification.add("https://$newPrefix$enteredUrl")
+        domainsForVerification.add("https://$newPrefix$enteredUrl/end-user/ui/")
+        domainsForVerification.add("https://$newPrefix$enteredUrl:9443/end-user/ui/")
 
     }
 
@@ -256,7 +263,6 @@ class Discovery(
                 url,
                 object : Callback {
                     override fun onFailure(call: Call, e: IOException) {
-                        Log.i("fail", e.toString())
                         serverDiscoveryFailed()
                     }
 
@@ -285,7 +291,7 @@ class Discovery(
                             val csrfPattern: Pattern = Pattern.compile("_csrf\".*")
                             val csrfMatcher: Matcher = csrfPattern.matcher(responseString)
                             if (csrfMatcher.find()) {
-                                val loginToken = responseString?.substring(
+                                val loginToken = responseString.substring(
                                     csrfMatcher.start() + 14,
                                     csrfMatcher.end() - 2
                                 )
@@ -296,7 +302,6 @@ class Discovery(
                                         "Discovery failed",
                                         "Server does not provide EU/MPS interface."
                                     )
-                                    //discoveryCallback.showLoginProgressBar(false)
                                 }
                             } else {
                                 serverDiscoveryFailed()

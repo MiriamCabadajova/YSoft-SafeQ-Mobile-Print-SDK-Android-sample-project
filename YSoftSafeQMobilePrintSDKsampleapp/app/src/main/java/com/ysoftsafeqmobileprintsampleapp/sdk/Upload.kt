@@ -2,12 +2,15 @@ package com.ysoftsafeqmobileprintsampleapp.sdk
 
 import android.util.Log
 import okhttp3.*
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
 import java.io.IOException
 import java.util.regex.Matcher
 import java.util.regex.Pattern
+
+/**
+ * Created by cabadajova on 16.4.2020.
+ */
 
 class Upload(
     private val uploadCallback: UploadCallback,
@@ -22,11 +25,6 @@ class Upload(
         fun isUploadBeingProcessed(flag: Boolean)
         fun selectBtnIsVisible(flag: Boolean)
     }
-
-    val DELIVERY_ENDPOINT_EUI = "eui"
-    val DELIVERY_ENDPOINT_MIG = "mig"
-    val DELIVERY_ENDPOINT_CUPS = "cups"
-
 
     private var reUploadCandidatesPaths = arrayListOf<String>()
     private var uploadedJobsCounter = 0
@@ -58,17 +56,20 @@ class Upload(
 
     fun handleUpload() {
         uploadCallback.isUploadBeingProcessed(true)
-        if (this.deliveryEndpoint == DELIVERY_ENDPOINT_EUI) {
-            getUploadPage()
-        } else if (this.deliveryEndpoint == DELIVERY_ENDPOINT_CUPS) {
-            uploadToCups()
-        } else {
-            uploadToMig()
+        when (this.deliveryEndpoint) {
+            DELIVERY_ENDPOINT_EUI -> {
+                getEUIUploadPage()
+            }
+            DELIVERY_ENDPOINT_CUPS -> {
+                uploadToCUPS()
+            }
+            else -> {
+                uploadToMIG()
+            }
         }
     }
 
-    //EUI Upload
-    private fun getUploadPage() {
+    private fun getEUIUploadPage() {
         val url: String = this.getUrl("upload-job")
         uploadCallback.isUploadBeingProcessed(true)
         reUploadCandidatesPaths = arrayListOf()
@@ -108,7 +109,7 @@ class Upload(
 
                             while (myFilePaths.isNotEmpty()) {
                                 //an item is always removed in uploadFile
-                                uploadFile(uploadToken, 0, myFilePaths.size == 1)
+                                uploadFileToEUI(uploadToken, myFilePaths.size == 1)
                             }
                         }
                     } else {
@@ -120,8 +121,8 @@ class Upload(
 
     }
 
-    private fun uploadFile(token: String, indexOfFile: Int, isLastElement: Boolean) {
-        val myFile = File(myFilePaths[indexOfFile])
+    private fun uploadFileToEUI(token: String, isLastElement: Boolean) {
+        val myFile = File(myFilePaths[0])
 
         val uploadUrl: String = this.getUrl("upload-job")
 
@@ -149,7 +150,7 @@ class Upload(
             } else {
                 failed = true
                 dialogMessageFailed += "\n\t" + myFile.name
-                reUploadCandidatesPaths.add(myFilePaths[indexOfFile])
+                reUploadCandidatesPaths.add(myFilePaths[0])
             }
 
             //after the upload of last file, show dialog
@@ -187,18 +188,17 @@ class Upload(
             uploadCallback.isUploadBeingProcessed(false)
         }
 
-        myFilePaths.removeAt(indexOfFile)
+        myFilePaths.removeAt(0)
     }
 
-    //MIG upload
-    private fun uploadToMig() {
+    private fun uploadToMIG() {
         while (myFilePaths.isNotEmpty()) {
-            uploadMigFile(0, myFilePaths.size == 1)
+            uploadFileToMIG(myFilePaths.size == 1)
         }
     }
 
-    private fun uploadMigFile(indexOfFile: Int, isLastElement: Boolean) {
-        val myFile = File(myFilePaths[indexOfFile])
+    private fun uploadFileToMIG(isLastElement: Boolean) {
+        val myFile = File(myFilePaths[0])
 
         val uploadUrl: String = this.getUrl("/ipp/print")
         val ippRequest = IppRequest(myFile.name)
@@ -271,18 +271,17 @@ class Upload(
         }
         )
 
-        myFilePaths.removeAt(indexOfFile)
+        myFilePaths.removeAt(0)
     }
 
-    //CUPS Upload
-    private fun uploadToCups() {
+    private fun uploadToCUPS() {
         while (myFilePaths.isNotEmpty()) {
-            uploadCupsFile(0, myFilePaths.size == 1)
+            uploadFileToCUPS(myFilePaths.size == 1)
         }
     }
 
-    private fun uploadCupsFile(indexOfFile: Int, isLastElement: Boolean) {
-        val myFile = File(myFilePaths[indexOfFile])
+    private fun uploadFileToCUPS(isLastElement: Boolean) {
+        val myFile = File(myFilePaths[0])
 
         val uploadUrl: String = this.getUrl("")
         val ippRequest = IppRequest(myFile.name)
@@ -349,7 +348,7 @@ class Upload(
 
         )
 
-        myFilePaths.removeAt(indexOfFile)
+        myFilePaths.removeAt(0)
 
     }
 }

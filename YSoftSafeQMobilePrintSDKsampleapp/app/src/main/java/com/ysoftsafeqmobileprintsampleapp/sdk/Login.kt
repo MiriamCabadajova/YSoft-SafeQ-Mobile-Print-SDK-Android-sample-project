@@ -16,6 +16,10 @@ import java.util.regex.Pattern
 import javax.net.ssl.HostnameVerifier
 import javax.net.ssl.SSLProtocolException
 
+/**
+ * Created by cabadajova on 16.4.2020.
+ */
+
 class Login(
     private val loginCallback: LoginCallback,
     private val context: Context,
@@ -24,8 +28,6 @@ class Login(
     private val password: String,
     private val savePreferences: Boolean
 ) {
-    val DELIVERY_ENDPOINT_EUI = "eui"
-    val DELIVERY_ENDPOINT_MIG = "mig"
 
     var deliveryEndpoint = DELIVERY_ENDPOINT_EUI
 
@@ -53,7 +55,8 @@ class Login(
             call.enqueue(callback)
 
         } catch (ex: IllegalArgumentException) {
-
+            loginCallback.showDialog("Login failed", ex.message.toString())
+            loginCallback.showLoginProgressBar(false)
         }
         return call!!
     }
@@ -296,7 +299,8 @@ class Login(
                             return
                         }
                     } catch (ex: SSLProtocolException) {
-
+                        loginCallback.showDialog("Login Failed", ex.message.toString())
+                        return
                     }
 
                     if (isSavePreferencesChecked) {
